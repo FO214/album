@@ -23,6 +23,8 @@ jobs:
   build-macos:
     name: macOS (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
         runner: [macos-13, macos-14]
@@ -53,6 +55,8 @@ jobs:
   build-windows:
     name: Windows
     runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
