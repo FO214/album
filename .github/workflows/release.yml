@@ -118,17 +118,29 @@ jobs:
             git push origin "$TAG"
           fi
 
-      - uses: actions/download-artifact@v4
+      - name: Download macOS (Intel) artifact
+        uses: actions/download-artifact@v4
         with:
-          path: collected
-          merge-multiple: true
+          name: album-macos-13
+          path: collected/macos-13
+          if-no-files-found: error
+
+      - name: Download macOS (Apple Silicon) artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: album-macos-14
+          path: collected/macos-14
+          if-no-files-found: error
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: album-windows
+          path: collected/windows
+          if-no-files-found: error
 
       - name: List collected artifacts
         run: ls -R collected
-
-      - name: Extract artifact archives
-        run: |
-          find collected -name "*.zip" -print -exec unzip -o {} -d collected \; -exec rm {} \;
 
       - name: Publish release
         uses: softprops/action-gh-release@v1
