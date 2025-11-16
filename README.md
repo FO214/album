@@ -14,5 +14,6 @@
 | `Cmd/Ctrl + Shift + P` | Play / Pause |
 | `Cmd/Ctrl + Shift + .` | Next track |
 | `Cmd/Ctrl + Shift + ,` | Previous track |
+| `Cmd/Ctrl + Shift + K` | Reset Spotify session |
 
 </div>
