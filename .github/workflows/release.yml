@@ -5,8 +5,18 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'electron/**'
+      - 'shared/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'electron-builder.json5'
+      - '.github/workflows/release.yml'
+      - 'tsconfig*.json'
   workflow_dispatch:
 
 jobs:
