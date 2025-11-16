@@ -4,28 +4,45 @@
 name: Release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-    paths:
-      - 'src/**'
-      - 'electron/**'
-      - 'shared/**'
-      - 'public/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'electron-builder.json5'
-      - '.github/workflows/release.yml'
-      - 'tsconfig*.json'
-  workflow_dispatch:
+      - 'v*'
 
 permissions:
   contents: write
 
 jobs:
+  autotag:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Create version tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
   build-macos:
     name: macOS (${{ matrix.runner }})
     runs-on: ${{ matrix.runner }}
+    if: startsWith(github.ref, 'refs/tags/')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
@@ -58,6 +75,7 @@ jobs:
   build-windows:
     name: Windows
     runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -90,7 +108,7 @@ jobs:
 
   publish:
     needs: [build-macos, build-windows]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -103,20 +121,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Create version tag and trigger release
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="v$VERSION"
-          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists."
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git tag "$TAG"
-            git push origin "$TAG"
-          fi
 
       - name: Download macOS (Intel) artifact
         uses: actions/download-artifact@v4
@@ -146,8 +150,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ env.RELEASE_TAG }}
-          target_commitish: main
+          tag_name: ${{ github.ref_name }}
+          target_commitish: ${{ github.ref_name }}
           files: |
             collected/**/*.{dmg,blockmap,exe}
 
