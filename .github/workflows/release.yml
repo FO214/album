@@ -121,9 +121,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: collected
+          merge-multiple: true
 
       - name: List collected artifacts
         run: ls -R collected
+
+      - name: Extract artifact archives
+        run: |
+          find collected -name "*.zip" -print -exec unzip -o {} -d collected \; -exec rm {} \;
 
       - name: Publish release
         uses: softprops/action-gh-release@v1
