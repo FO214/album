@@ -1,5 +1,5 @@
 # Builds Album for macOS (Intel + Apple Silicon) and Windows, then
-# attaches the installers to a GitHub release whenever a tag is pushed.
+# attaches the installers to a GitHub release.
 
 name: Release
 
@@ -8,17 +8,16 @@ on:
   push:
     branches:
       - main
-  push:
-    tags:
-      - 'v*'
 
 permissions:
   contents: write
 
 jobs:
-  autotag:
-    if: github.ref == 'refs/heads/main'
+  create-release:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,10 +27,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create version tag
+      - name: Get version and create tag
+        id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           TAG="v$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "Tag $TAG already exists."
           else
@@ -41,15 +44,21 @@ jobs:
             git push origin "$TAG"
           fi
 
-  build-macos:
-    name: macOS (${{ matrix.runner }})
-    runs-on: ${{ matrix.runner }}
-    if: startsWith(github.ref, 'refs/tags/')
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Album ${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+
+  build-macos-intel:
+    needs: create-release
+    name: macOS (Intel)
+    runs-on: macos-13
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    strategy:
-      matrix:
-        runner: [macos-13, macos-14]
     steps:
       - uses: actions/checkout@v4
 
@@ -66,18 +75,50 @@ jobs:
       - name: Build (Electron + DMG)
         run: npm run build
 
-      - name: Capture artifacts
-        run: echo "RELEASE_DIR=release/$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
-
-      - uses: actions/upload-artifact@v4
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
         with:
-          name: album-${{ matrix.runner }}
-          path: ${{ env.RELEASE_DIR }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ needs.create-release.outputs.tag }}
+          files: |
+            release/${{ needs.create-release.outputs.version }}/*.dmg
+            release/${{ needs.create-release.outputs.version }}/*.blockmap
+
+  build-macos-arm:
+    needs: create-release
+    name: macOS (Apple Silicon)
+    runs-on: macos-14
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (Electron + DMG)
+        run: npm run build
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ needs.create-release.outputs.tag }}
+          files: |
+            release/${{ needs.create-release.outputs.version }}/*.dmg
+            release/${{ needs.create-release.outputs.version }}/*.blockmap
 
   build-windows:
+    needs: create-release
     name: Windows
     runs-on: windows-latest
-    if: startsWith(github.ref, 'refs/tags/')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -97,63 +138,9 @@ jobs:
         shell: bash
         run: npm run build
 
-      - name: Capture artifacts
-        shell: pwsh
-        run: |
-          $version = node -p "require('./package.json').version"
-          Add-Content -Path $env:GITHUB_ENV -Value "RELEASE_DIR=release/$version"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: album-windows
-          path: ${{ env.RELEASE_DIR }}
-
-  publish:
-    needs: [build-macos, build-windows]
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Download macOS (Intel) artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: album-macos-13
-          path: collected/macos-13
-          if-no-files-found: error
-
-      - name: Download macOS (Apple Silicon) artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: album-macos-14
-          path: collected/macos-14
-          if-no-files-found: error
-
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: album-windows
-          path: collected/windows
-          if-no-files-found: error
-
-      - name: List collected artifacts
-        run: ls -R collected
-
-      - name: Publish release
+      - name: Upload to release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          target_commitish: ${{ github.ref_name }}
-          files: |
-            collected/**/*.{dmg,blockmap,exe}
-
+          tag_name: ${{ needs.create-release.outputs.tag }}
+          files: release/${{ needs.create-release.outputs.version }}/*.exe
