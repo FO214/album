@@ -107,6 +107,9 @@ function App() {
           <span>{elapsedLabel}</span>
           <span>{durationLabel}</span>
         </div>
+        {playbackState.error && (
+          <p className="error-chip" style={{ marginTop: '8px' }}>{playbackState.error}</p>
+        )}
       </section>
     </main>
   )

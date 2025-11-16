@@ -134,7 +134,10 @@ export class SpotifyPlaybackService extends EventEmitter {
       })
 
       if (response.status === 204) {
-        this.updateState(this.emptyState('idle'))
+        this.updateState({
+          ...this.emptyState('idle'),
+          error: 'No active Spotify session. Open Spotify and start playing.',
+        })
         return
       }
 
@@ -149,7 +152,7 @@ export class SpotifyPlaybackService extends EventEmitter {
 
       if (!response.ok) {
         const errorText = await response.text()
-        this.setError(`Playback refresh failed (${response.status}): ${errorText}`)
+        this.setError(`API Error (${response.status}): ${errorText || 'Unknown error'}`)
         return
       }
 
