@@ -1,5 +1,5 @@
-var se = Object.defineProperty;
-var ne = (t, o, e) => o in t ? se(t, o, { enumerable: !0, configurable: !0, writable: !0, value: e }) : t[o] = e;
+var re = Object.defineProperty;
+var ne = (t, o, e) => o in t ? re(t, o, { enumerable: !0, configurable: !0, writable: !0, value: e }) : t[o] = e;
 var y = (t, o, e) => ne(t, typeof o != "symbol" ? o + "" : o, e);
 import oe from "fs";
 import ae from "path";
@@ -11,11 +11,11 @@ import v from "node:path";
 import { readFile as de } from "node:fs/promises";
 import R from "keytar";
 import $ from "node:crypto";
-import { EventEmitter as W } from "node:events";
+import { EventEmitter as z } from "node:events";
 var w = { exports: {} };
 const fe = "17.2.3", pe = {
   version: fe
-}, M = oe, U = ae, ge = ie, me = ce, ye = pe, G = ye.version, K = [
+}, M = oe, U = ae, ge = ie, me = ce, ye = pe, G = ye.version, j = [
   "🔐 encrypt with Dotenvx: https://dotenvx.com",
   "🔐 prevent committing .env to code: https://dotenvx.com/precommit",
   "🔐 prevent building .env in docker: https://dotenvx.com/prebuild",
@@ -34,9 +34,9 @@ const fe = "17.2.3", pe = {
   "⚙️  load multiple .env files with { path: ['.env.local', '.env'] }"
 ];
 function ve() {
-  return K[Math.floor(Math.random() * K.length)];
+  return j[Math.floor(Math.random() * j.length)];
 }
-function N(t) {
+function D(t) {
   return typeof t == "string" ? !["false", "0", "no", "off", ""].includes(t.toLowerCase()) : !!t;
 }
 function we() {
@@ -51,38 +51,38 @@ function Te(t) {
   let e = t.toString();
   e = e.replace(/\r\n?/mg, `
 `);
-  let r;
-  for (; (r = _e.exec(e)) != null; ) {
-    const n = r[1];
-    let s = r[2] || "";
-    s = s.trim();
-    const a = s[0];
-    s = s.replace(/^(['"`])([\s\S]*)\1$/mg, "$2"), a === '"' && (s = s.replace(/\\n/g, `
-`), s = s.replace(/\\r/g, "\r")), o[n] = s;
+  let s;
+  for (; (s = _e.exec(e)) != null; ) {
+    const n = s[1];
+    let r = s[2] || "";
+    r = r.trim();
+    const a = r[0];
+    r = r.replace(/^(['"`])([\s\S]*)\1$/mg, "$2"), a === '"' && (r = r.replace(/\\n/g, `
+`), r = r.replace(/\\r/g, "\r")), o[n] = r;
   }
   return o;
 }
 function ke(t) {
   t = t || {};
-  const o = Q(t);
+  const o = J(t);
   t.path = o;
   const e = u.configDotenv(t);
   if (!e.parsed) {
     const a = new Error(`MISSING_DATA: Cannot parse ${o} for an unknown reason`);
     throw a.code = "MISSING_DATA", a;
   }
-  const r = H(t).split(","), n = r.length;
-  let s;
+  const s = Q(t).split(","), n = s.length;
+  let r;
   for (let a = 0; a < n; a++)
     try {
-      const i = r[a].trim(), h = Se(e, i);
-      s = u.decrypt(h.ciphertext, h.key);
+      const i = s[a].trim(), h = Se(e, i);
+      r = u.decrypt(h.ciphertext, h.key);
       break;
     } catch (i) {
       if (a + 1 >= n)
         throw i;
     }
-  return u.parse(s);
+  return u.parse(r);
 }
 function Oe(t) {
   console.error(`[dotenv@${G}][WARN] ${t}`);
@@ -90,10 +90,10 @@ function Oe(t) {
 function I(t) {
   console.log(`[dotenv@${G}][DEBUG] ${t}`);
 }
-function z(t) {
+function H(t) {
   console.log(`[dotenv@${G}] ${t}`);
 }
-function H(t) {
+function Q(t) {
   return t && t.DOTENV_KEY && t.DOTENV_KEY.length > 0 ? t.DOTENV_KEY : process.env.DOTENV_KEY && process.env.DOTENV_KEY.length > 0 ? process.env.DOTENV_KEY : "";
 }
 function Se(t, o) {
@@ -107,8 +107,8 @@ function Se(t, o) {
     }
     throw i;
   }
-  const r = e.password;
-  if (!r) {
+  const s = e.password;
+  if (!s) {
     const i = new Error("INVALID_DOTENV_KEY: Missing key part");
     throw i.code = "INVALID_DOTENV_KEY", i;
   }
@@ -117,14 +117,14 @@ function Se(t, o) {
     const i = new Error("INVALID_DOTENV_KEY: Missing environment part");
     throw i.code = "INVALID_DOTENV_KEY", i;
   }
-  const s = `DOTENV_VAULT_${n.toUpperCase()}`, a = t.parsed[s];
+  const r = `DOTENV_VAULT_${n.toUpperCase()}`, a = t.parsed[r];
   if (!a) {
-    const i = new Error(`NOT_FOUND_DOTENV_ENVIRONMENT: Cannot locate environment ${s} in your .env.vault file.`);
+    const i = new Error(`NOT_FOUND_DOTENV_ENVIRONMENT: Cannot locate environment ${r} in your .env.vault file.`);
     throw i.code = "NOT_FOUND_DOTENV_ENVIRONMENT", i;
   }
-  return { ciphertext: a, key: r };
+  return { ciphertext: a, key: s };
 }
-function Q(t) {
+function J(t) {
   let o = null;
   if (t && t.path && t.path.length > 0)
     if (Array.isArray(t.path))
@@ -136,30 +136,30 @@ function Q(t) {
     o = U.resolve(process.cwd(), ".env.vault");
   return M.existsSync(o) ? o : null;
 }
-function j(t) {
+function q(t) {
   return t[0] === "~" ? U.join(ge.homedir(), t.slice(1)) : t;
 }
 function be(t) {
-  const o = N(process.env.DOTENV_CONFIG_DEBUG || t && t.debug), e = N(process.env.DOTENV_CONFIG_QUIET || t && t.quiet);
-  (o || !e) && z("Loading env from encrypted .env.vault");
-  const r = u._parseVault(t);
+  const o = D(process.env.DOTENV_CONFIG_DEBUG || t && t.debug), e = D(process.env.DOTENV_CONFIG_QUIET || t && t.quiet);
+  (o || !e) && H("Loading env from encrypted .env.vault");
+  const s = u._parseVault(t);
   let n = process.env;
-  return t && t.processEnv != null && (n = t.processEnv), u.populate(n, r, t), { parsed: r };
+  return t && t.processEnv != null && (n = t.processEnv), u.populate(n, s, t), { parsed: s };
 }
-function Ne(t) {
+function De(t) {
   const o = U.resolve(process.cwd(), ".env");
-  let e = "utf8", r = process.env;
-  t && t.processEnv != null && (r = t.processEnv);
-  let n = N(r.DOTENV_CONFIG_DEBUG || t && t.debug), s = N(r.DOTENV_CONFIG_QUIET || t && t.quiet);
+  let e = "utf8", s = process.env;
+  t && t.processEnv != null && (s = t.processEnv);
+  let n = D(s.DOTENV_CONFIG_DEBUG || t && t.debug), r = D(s.DOTENV_CONFIG_QUIET || t && t.quiet);
   t && t.encoding ? e = t.encoding : n && I("No encoding is specified. UTF-8 is used by default");
   let a = [o];
   if (t && t.path)
     if (!Array.isArray(t.path))
-      a = [j(t.path)];
+      a = [q(t.path)];
     else {
       a = [];
       for (const l of t.path)
-        a.push(j(l));
+        a.push(q(l));
     }
   let i;
   const h = {};
@@ -170,8 +170,8 @@ function Ne(t) {
     } catch (d) {
       n && I(`Failed to load ${l} ${d.message}`), i = d;
     }
-  const p = u.populate(r, h, t);
-  if (n = N(r.DOTENV_CONFIG_DEBUG || n), s = N(r.DOTENV_CONFIG_QUIET || s), n || !s) {
+  const p = u.populate(s, h, t);
+  if (n = D(s.DOTENV_CONFIG_DEBUG || n), r = D(s.DOTENV_CONFIG_QUIET || r), n || !r) {
     const l = Object.keys(p).length, d = [];
     for (const E of a)
       try {
@@ -180,24 +180,24 @@ function Ne(t) {
       } catch (g) {
         n && I(`Failed to load ${E} ${g.message}`), i = g;
       }
-    z(`injecting env (${l}) from ${d.join(",")} ${Ee(`-- tip: ${ve()}`)}`);
+    H(`injecting env (${l}) from ${d.join(",")} ${Ee(`-- tip: ${ve()}`)}`);
   }
   return i ? { parsed: h, error: i } : { parsed: h };
 }
-function De(t) {
-  if (H(t).length === 0)
+function Ne(t) {
+  if (Q(t).length === 0)
     return u.configDotenv(t);
-  const o = Q(t);
+  const o = J(t);
   return o ? u._configVault(t) : (Oe(`You set DOTENV_KEY but you are missing a .env.vault file at ${o}. Did you forget to build it?`), u.configDotenv(t));
 }
 function Ie(t, o) {
   const e = Buffer.from(o.slice(-64), "hex");
-  let r = Buffer.from(t, "base64");
-  const n = r.subarray(0, 12), s = r.subarray(-16);
-  r = r.subarray(12, -16);
+  let s = Buffer.from(t, "base64");
+  const n = s.subarray(0, 12), r = s.subarray(-16);
+  s = s.subarray(12, -16);
   try {
     const a = me.createDecipheriv("aes-256-gcm", e, n);
-    return a.setAuthTag(s), `${a.update(r)}${a.final()}`;
+    return a.setAuthTag(r), `${a.update(s)}${a.final()}`;
   } catch (a) {
     const i = a instanceof RangeError, h = a.message === "Invalid key length", p = a.message === "Unsupported state or unable to authenticate data";
     if (i || h) {
@@ -211,20 +211,20 @@ function Ie(t, o) {
   }
 }
 function Ce(t, o, e = {}) {
-  const r = !!(e && e.debug), n = !!(e && e.override), s = {};
+  const s = !!(e && e.debug), n = !!(e && e.override), r = {};
   if (typeof o != "object") {
     const a = new Error("OBJECT_REQUIRED: Please check the processEnv argument being passed to populate");
     throw a.code = "OBJECT_REQUIRED", a;
   }
   for (const a of Object.keys(o))
-    Object.prototype.hasOwnProperty.call(t, a) ? (n === !0 && (t[a] = o[a], s[a] = o[a]), r && I(n === !0 ? `"${a}" is already defined and WAS overwritten` : `"${a}" is already defined and was NOT overwritten`)) : (t[a] = o[a], s[a] = o[a]);
-  return s;
+    Object.prototype.hasOwnProperty.call(t, a) ? (n === !0 && (t[a] = o[a], r[a] = o[a]), s && I(n === !0 ? `"${a}" is already defined and WAS overwritten` : `"${a}" is already defined and was NOT overwritten`)) : (t[a] = o[a], r[a] = o[a]);
+  return r;
 }
 const u = {
-  configDotenv: Ne,
+  configDotenv: De,
   _configVault: be,
   _parseVault: ke,
-  config: De,
+  config: Ne,
   decrypt: Ie,
   parse: Te,
   populate: Ce
@@ -248,9 +248,9 @@ process.env.DOTENV_CONFIG_DOTENV_KEY != null && (k.DOTENV_KEY = process.env.DOTE
 var Ae = k;
 const Re = /^dotenv_config_(encoding|path|quiet|debug|override|DOTENV_KEY)=(.+)$/;
 var Pe = function(o) {
-  const e = o.reduce(function(r, n) {
-    const s = n.match(Re);
-    return s && (r[s[1]] = s[2]), r;
+  const e = o.reduce(function(s, n) {
+    const r = n.match(Re);
+    return r && (s[r[1]] = r[2]), s;
   }, {});
   return "quiet" in e || (e.quiet = "true"), e;
 };
@@ -267,8 +267,8 @@ const P = "spotify-overlay", x = "auth-tokens", xe = [
   "user-read-playback-state",
   "user-read-currently-playing",
   "user-modify-playback-state"
-].join(" "), q = 60 * 1e3;
-class Ue extends W {
+].join(" "), W = 60 * 1e3;
+class Ue extends z {
   constructor(e) {
     super();
     y(this, "tokens", null);
@@ -280,18 +280,18 @@ class Ue extends W {
   async login() {
     await this.ensureReady(), this.assertClientId(), this.emitLoadingState();
     try {
-      const { verifier: e, challenge: r } = await this.createPkcePair(), n = $.randomUUID(), s = new URL("https://accounts.spotify.com/authorize");
-      s.search = new URLSearchParams({
+      const { verifier: e, challenge: s } = await this.createPkcePair(), n = $.randomUUID(), r = new URL("https://accounts.spotify.com/authorize");
+      r.search = new URLSearchParams({
         client_id: this.config.clientId,
         response_type: "code",
         redirect_uri: this.config.redirectUri,
         code_challenge_method: "S256",
-        code_challenge: r,
+        code_challenge: s,
         scope: this.scope,
         state: n,
         show_dialog: "true"
       }).toString();
-      const a = await this.openAuthWindow(s.toString(), n), i = await this.requestTokens({
+      const a = await this.openAuthWindow(r.toString(), n), i = await this.requestTokens({
         grant_type: "authorization_code",
         code: a,
         redirect_uri: this.config.redirectUri,
@@ -310,11 +310,11 @@ class Ue extends W {
     return await this.ensureReady(), this.buildState();
   }
   async getValidTokens() {
-    return await this.ensureReady(), !this.tokens || this.tokens.expiresAt - q <= Date.now() && !await this.refreshTokens() ? null : this.tokens;
+    return await this.ensureReady(), !this.tokens || this.tokens.expiresAt - W <= Date.now() && !await this.refreshTokens() ? null : this.tokens;
   }
   async refreshTokens() {
-    var r;
-    if (!((r = this.tokens) != null && r.refreshToken))
+    var s;
+    if (!((s = this.tokens) != null && s.refreshToken))
       return await this.logout(), null;
     this.assertClientId(), this.emitLoadingState();
     const e = await this.requestTokens({
@@ -331,12 +331,12 @@ class Ue extends W {
     });
   }
   async requestTokens(e) {
-    const r = new URLSearchParams(e), n = await fetch("https://accounts.spotify.com/api/token", {
+    const s = new URLSearchParams(e), n = await fetch("https://accounts.spotify.com/api/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: r
+      body: s
     });
     if (!n.ok) {
       const a = await n.text();
@@ -345,19 +345,19 @@ class Ue extends W {
     return await n.json();
   }
   async persistTokens(e) {
-    var s;
-    const r = e.refresh_token ?? ((s = this.tokens) == null ? void 0 : s.refreshToken);
-    if (!r)
+    var r;
+    const s = e.refresh_token ?? ((r = this.tokens) == null ? void 0 : r.refreshToken);
+    if (!s)
       throw new Error("Spotify did not return a refresh token");
     const n = {
       accessToken: e.access_token,
-      refreshToken: r,
+      refreshToken: s,
       expiresAt: Date.now() + e.expires_in * 1e3
     };
     return this.tokens = n, await R.setPassword(P, x, JSON.stringify(n)), this.scheduleRefresh(), this.emitState();
   }
-  async openAuthWindow(e, r) {
-    return new Promise((n, s) => {
+  async openAuthWindow(e, s) {
+    return new Promise((n, r) => {
       let a = !1;
       const i = new V({
         width: 420,
@@ -373,36 +373,36 @@ class Ue extends W {
         a || (a = !0, h(), d());
       };
       i.on("closed", () => {
-        p(() => s(new Error("Spotify login was closed before completion")));
+        p(() => r(new Error("Spotify login was closed before completion")));
       }), i.webContents.setWindowOpenHandler(({ url: d }) => (le.openExternal(d), { action: "deny" }));
       const l = (d, E) => {
         if (!E.startsWith(this.config.redirectUri))
           return;
-        const g = new URL(E), D = g.searchParams.get("code"), m = g.searchParams.get("state"), b = g.searchParams.get("error");
-        if (m && m !== r) {
-          p(() => s(new Error("State mismatch during Spotify authentication"))), i.close();
+        const g = new URL(E), N = g.searchParams.get("code"), m = g.searchParams.get("state"), b = g.searchParams.get("error");
+        if (m && m !== s) {
+          p(() => r(new Error("State mismatch during Spotify authentication"))), i.close();
           return;
         }
         if (b) {
-          p(() => s(new Error(`Spotify authentication failed: ${b}`))), i.close();
+          p(() => r(new Error(`Spotify authentication failed: ${b}`))), i.close();
           return;
         }
-        if (!D) {
-          p(() => s(new Error("Missing authorization code from Spotify"))), i.close();
+        if (!N) {
+          p(() => r(new Error("Missing authorization code from Spotify"))), i.close();
           return;
         }
-        p(() => n(D)), i.close();
+        p(() => n(N)), i.close();
       };
-      i.webContents.on("will-redirect", l), i.webContents.on("will-navigate", l), i.loadURL(e).catch((d) => p(() => s(d)));
+      i.webContents.on("will-redirect", l), i.webContents.on("will-navigate", l), i.loadURL(e).catch((d) => p(() => r(d)));
     });
   }
   scheduleRefresh() {
     if (this.clearRefreshTimer(), !this.tokens)
       return;
-    const e = Math.max(this.tokens.expiresAt - Date.now() - q, 0);
+    const e = Math.max(this.tokens.expiresAt - Date.now() - W, 0);
     this.refreshTimer = setTimeout(() => {
-      this.refreshTokens().catch((r) => {
-        this.emitState(r instanceof Error ? r.message : String(r));
+      this.refreshTokens().catch((s) => {
+        this.emitState(s instanceof Error ? s.message : String(s));
       });
     }, e);
   }
@@ -410,22 +410,22 @@ class Ue extends W {
     this.refreshTimer && (clearTimeout(this.refreshTimer), this.refreshTimer = null);
   }
   buildState(e) {
-    var r;
+    var s;
     return {
       status: e ? "error" : this.tokens ? "authenticated" : "signed-out",
-      expiresAt: ((r = this.tokens) == null ? void 0 : r.expiresAt) ?? null,
+      expiresAt: ((s = this.tokens) == null ? void 0 : s.expiresAt) ?? null,
       ...e ? { error: e } : {}
     };
   }
   emitState(e) {
-    const r = this.buildState(e);
-    return this.emit("auth-state", r), r;
+    const s = this.buildState(e);
+    return this.emit("auth-state", s), s;
   }
   emitLoadingState() {
-    var r;
+    var s;
     const e = {
       status: "loading",
-      expiresAt: ((r = this.tokens) == null ? void 0 : r.expiresAt) ?? null
+      expiresAt: ((s = this.tokens) == null ? void 0 : s.expiresAt) ?? null
     };
     this.emit("auth-state", e);
   }
@@ -437,20 +437,20 @@ class Ue extends W {
     const e = await R.getPassword(P, x);
     if (e)
       try {
-        const r = JSON.parse(e);
-        this.tokens = r, this.scheduleRefresh();
-      } catch (r) {
-        await R.deletePassword(P, x), this.emitState(r instanceof Error ? r.message : String(r));
+        const s = JSON.parse(e);
+        this.tokens = s, this.scheduleRefresh();
+      } catch (s) {
+        await R.deletePassword(P, x), this.emitState(s instanceof Error ? s.message : String(s));
       }
   }
   ensureReady() {
     return this.ready;
   }
   async createPkcePair() {
-    const e = this.base64UrlEncode($.randomBytes(32).toString("base64url")), r = this.base64UrlEncode(
+    const e = this.base64UrlEncode($.randomBytes(32).toString("base64url")), s = this.base64UrlEncode(
       $.createHash("sha256").update(e).digest("base64")
     );
-    return { verifier: e, challenge: r };
+    return { verifier: e, challenge: s };
   }
   base64UrlEncode(e) {
     return e.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -462,14 +462,14 @@ const $e = "https://api.spotify.com/v1/me/player/currently-playing?additional_ty
   progressMs: 0,
   updatedAt: Date.now()
 };
-class Fe extends W {
-  constructor(e, r) {
+class Fe extends z {
+  constructor(e, s) {
     super();
     y(this, "state", Le);
     y(this, "timer", null);
     y(this, "intervalMs");
     y(this, "lastControlAt", 0);
-    this.auth = e, this.intervalMs = (r == null ? void 0 : r.intervalMs) ?? 3e3;
+    this.auth = e, this.intervalMs = (s == null ? void 0 : s.intervalMs) ?? 3e3;
   }
   start() {
     this.timer || (this.timer = setInterval(() => {
@@ -487,8 +487,8 @@ class Fe extends W {
   }
   async togglePlayback() {
     await this.withControl("play-pause", async (e) => {
-      const r = `${L}/${this.state.status === "playing" ? "pause" : "play"}`;
-      await fetch(r, {
+      const s = `${L}/${this.state.status === "playing" ? "pause" : "play"}`;
+      await fetch(s, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${e}`,
@@ -518,15 +518,15 @@ class Fe extends W {
     });
   }
   async refresh(e = !1) {
-    const r = await this.auth.getValidTokens();
-    if (!r) {
+    const s = await this.auth.getValidTokens();
+    if (!s) {
       (this.state.status !== "unauthorized" || e) && this.updateState(this.emptyState("unauthorized"));
       return;
     }
     try {
       const n = await fetch($e, {
         headers: {
-          Authorization: `Bearer ${r.accessToken}`
+          Authorization: `Bearer ${s.accessToken}`
         }
       });
       if (n.status === 204) {
@@ -545,21 +545,21 @@ class Fe extends W {
         this.setError(`Playback refresh failed (${n.status}): ${i}`);
         return;
       }
-      const s = await n.json(), a = this.normalizePayload(s);
+      const r = await n.json(), a = this.normalizePayload(r);
       this.updateState(a);
     } catch (n) {
       this.setError(n instanceof Error ? n.message : String(n));
     }
   }
-  async withControl(e, r) {
+  async withControl(e, s) {
     if (Date.now() - this.lastControlAt < 500)
       return;
     const n = await this.auth.getValidTokens();
     if (n)
       try {
-        await r(n.accessToken), this.lastControlAt = Date.now(), await this.refresh(!0);
-      } catch (s) {
-        this.setError(s instanceof Error ? s.message : String(s));
+        await s(n.accessToken), this.lastControlAt = Date.now(), await this.refresh(!0);
+      } catch (r) {
+        this.setError(r instanceof Error ? r.message : String(r));
       }
   }
   emptyState(e) {
@@ -571,21 +571,21 @@ class Fe extends W {
     };
   }
   normalizePayload(e) {
-    var l, d, E, g, D;
-    const r = e == null ? void 0 : e.item, n = Array.isArray(r == null ? void 0 : r.artists) ? r.artists.map((m) => m == null ? void 0 : m.name).filter(Boolean).join(", ") : "Unknown artist", s = ((l = r == null ? void 0 : r.album) == null ? void 0 : l.images) ?? [], i = ((d = (Array.isArray(s) ? [...s].sort((m, b) => ((b == null ? void 0 : b.width) ?? 0) - ((m == null ? void 0 : m.width) ?? 0)) : [])[0]) == null ? void 0 : d.url) ?? null, h = r ? {
-      id: r.id ?? r.uri ?? "unknown",
-      name: r.name ?? "Unknown track",
+    var l, d, E, g, N;
+    const s = e == null ? void 0 : e.item, n = Array.isArray(s == null ? void 0 : s.artists) ? s.artists.map((m) => m == null ? void 0 : m.name).filter(Boolean).join(", ") : "Unknown artist", r = ((l = s == null ? void 0 : s.album) == null ? void 0 : l.images) ?? [], i = ((d = (Array.isArray(r) ? [...r].sort((m, b) => ((b == null ? void 0 : b.width) ?? 0) - ((m == null ? void 0 : m.width) ?? 0)) : [])[0]) == null ? void 0 : d.url) ?? null, h = s ? {
+      id: s.id ?? s.uri ?? "unknown",
+      name: s.name ?? "Unknown track",
       artists: n || "Unknown artist",
-      album: ((E = r.album) == null ? void 0 : E.name) ?? "Unknown album",
+      album: ((E = s.album) == null ? void 0 : E.name) ?? "Unknown album",
       albumImageUrl: i,
-      durationMs: r.duration_ms ?? 0,
-      spotifyUrl: ((g = r.external_urls) == null ? void 0 : g.spotify) ?? null
+      durationMs: s.duration_ms ?? 0,
+      spotifyUrl: ((g = s.external_urls) == null ? void 0 : g.spotify) ?? null
     } : null;
     return {
       status: h ? e != null && e.is_playing ? "playing" : "paused" : "idle",
       track: h,
       progressMs: (e == null ? void 0 : e.progress_ms) ?? 0,
-      deviceName: ((D = e == null ? void 0 : e.device) == null ? void 0 : D.name) ?? null,
+      deviceName: ((N = e == null ? void 0 : e.device) == null ? void 0 : N.name) ?? null,
       updatedAt: Date.now()
     };
   }
@@ -599,14 +599,14 @@ class Fe extends W {
     });
   }
   updateState(e) {
-    var n, s;
-    (e.status !== this.state.status || ((n = e.track) == null ? void 0 : n.id) !== ((s = this.state.track) == null ? void 0 : s.id) || e.progressMs !== this.state.progressMs || e.deviceName !== this.state.deviceName || e.error !== this.state.error) && (this.state = e, this.emit("state", this.state));
+    var n, r;
+    (e.status !== this.state.status || ((n = e.track) == null ? void 0 : n.id) !== ((r = this.state.track) == null ? void 0 : r.id) || e.progressMs !== this.state.progressMs || e.deviceName !== this.state.deviceName || e.error !== this.state.error) && (this.state = e, this.emit("state", this.state));
   }
 }
-const J = v.dirname(he(import.meta.url));
-process.env.APP_ROOT = v.join(J, "..");
-const Y = process.env.VITE_DEV_SERVER_URL, nt = v.join(process.env.APP_ROOT, "dist-electron"), X = v.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = Y ? v.join(process.env.APP_ROOT, "public") : X;
+const X = v.dirname(he(import.meta.url));
+process.env.APP_ROOT = v.join(X, "..");
+const Y = process.env.VITE_DEV_SERVER_URL, nt = v.join(process.env.APP_ROOT, "dist-electron"), Z = v.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = Y ? v.join(process.env.APP_ROOT, "public") : Z;
 let c;
 const F = "CommandOrControl+Shift+Space", Be = "CommandOrControl+Shift+P", Me = "CommandOrControl+Shift+.", Ye = "CommandOrControl+Shift+,", B = "CommandOrControl+Shift+K", A = {
   state: "spotify:auth-state",
@@ -650,7 +650,7 @@ _.handle(O.refresh, () => f.forceRefresh());
 _.handle(O.playPause, () => f.togglePlayback());
 _.handle(O.next, () => f.nextTrack());
 _.handle(O.previous, () => f.previousTrack());
-async function Z() {
+async function K() {
   const t = await de(v.join(process.env.VITE_PUBLIC, "album-icon.png")).catch(() => null), o = t ? ue.createFromBuffer(t) : void 0;
   c = new V({
     width: 360,
@@ -669,7 +669,7 @@ async function Z() {
     backgroundColor: "#00000000",
     titleBarStyle: "hidden",
     webPreferences: {
-      preload: v.join(J, "preload.mjs"),
+      preload: v.join(X, "preload.mjs"),
       backgroundThrottling: !1
     }
   }), c.setMenuBarVisibility(!1), c.setAlwaysOnTop(!0, "screen-saver");
@@ -679,20 +679,24 @@ async function Z() {
     c.setVisibleOnAllWorkspaces(!0);
   }
   c.webContents.on("did-finish-load", () => {
-    c == null || c.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString()), S.getAuthState().then((r) => {
-      c == null || c.webContents.send(A.state, r);
+    c == null || c.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString()), S.getAuthState().then((s) => {
+      c == null || c.webContents.send(A.state, s);
     });
     const e = f.getState();
     c == null || c.webContents.send(O.state, e);
-  }), c.webContents.on("before-input-event", (e, r) => {
-    var s;
-    r.type === "keyDown" && ((r.meta || r.control) && r.shift && ((s = r.key) == null ? void 0 : s.toLowerCase()) === "i" || r.key === "F12") && e.preventDefault();
+  }), c.webContents.on("before-input-event", (e, s) => {
+    var r;
+    s.type === "keyDown" && ((s.meta || s.control) && s.shift && ((r = s.key) == null ? void 0 : r.toLowerCase()) === "i" || s.key === "F12") && e.preventDefault();
   }), c.webContents.on("devtools-opened", () => {
     c == null || c.webContents.closeDevTools();
-  }), c.webContents.setWindowOpenHandler(() => ({ action: "deny" })), process.platform === "darwin" && typeof c.setWindowButtonVisibility == "function" && c.setWindowButtonVisibility(!1), Y ? c.loadURL(Y) : c.loadFile(v.join(X, "index.html"));
+  }), c.webContents.setWindowOpenHandler(() => ({ action: "deny" })), process.platform === "darwin" && typeof c.setWindowButtonVisibility == "function" && c.setWindowButtonVisibility(!1), Y ? c.loadURL(Y) : c.loadFile(v.join(Z, "index.html"));
 }
-function je() {
-  c && (c.isVisible() ? c.hide() : (c.show(), c.focus(), c.setAlwaysOnTop(!0, "screen-saver")));
+async function je() {
+  if (!c || c.isDestroyed()) {
+    await K();
+    return;
+  }
+  c.isVisible() ? c.hide() : (c.show(), c.focus(), c.setAlwaysOnTop(!0, "screen-saver"));
 }
 function ee() {
   T.unregister(F), T.register(F, je) || console.warn(`Failed to register overlay toggle shortcut: ${F}`);
@@ -712,7 +716,7 @@ function te() {
     T.unregister(o), T.register(o, e) || console.warn(`Failed to register shortcut: ${o}`);
   });
 }
-function re() {
+function se() {
   T.unregister(B), T.register(B, () => {
     S.logout().then(() => f.forceRefresh());
   }) || console.warn(`Failed to register shortcut: ${B}`);
@@ -721,10 +725,10 @@ C.on("window-all-closed", () => {
   process.platform !== "darwin" && (C.quit(), c = null);
 });
 C.on("activate", () => {
-  V.getAllWindows().length === 0 && (Z(), ee(), te(), re());
+  V.getAllWindows().length === 0 && (K(), ee(), te(), se());
 });
 C.whenReady().then(() => {
-  f.start(), Z(), ee(), te(), re(), c == null || c.once("ready-to-show", () => {
+  f.start(), K(), ee(), te(), se(), c == null || c.once("ready-to-show", () => {
     c == null || c.show();
   });
 });
@@ -733,6 +737,6 @@ C.on("will-quit", () => {
 });
 export {
   nt as MAIN_DIST,
-  X as RENDERER_DIST,
+  Z as RENDERER_DIST,
   Y as VITE_DEV_SERVER_URL
 };

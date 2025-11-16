@@ -165,8 +165,9 @@ async function createWindow() {
   }
 }
 
-function toggleOverlayVisibility() {
-  if (!win) {
+async function toggleOverlayVisibility() {
+  if (!win || win.isDestroyed()) {
+    await createWindow()
     return
   }
 
