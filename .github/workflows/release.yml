@@ -19,6 +19,9 @@ on:
       - 'tsconfig*.json'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-macos:
     name: macOS (${{ matrix.runner }})
