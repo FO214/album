@@ -1,0 +1,93 @@
+# Builds Album for macOS (Intel + Apple Silicon) and Windows, then
+# attaches the installers to a GitHub release whenever a tag is pushed.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    name: macOS (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner: [macos-13, macos-14]
+    env:
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (Electron + DMG)
+        run: npm run build
+
+      - name: Capture artifacts
+        run: echo "RELEASE_DIR=release/$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: album-${{ matrix.runner }}
+          path: ${{ env.RELEASE_DIR }}
+
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+    env:
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (Electron + NSIS)
+        shell: bash
+        run: npm run build
+
+      - name: Capture artifacts
+        shell: bash
+        run: echo "RELEASE_DIR=release/$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: album-windows
+          path: ${{ env.RELEASE_DIR }}
+
+  publish:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: collected
+
+      - name: List collected artifacts
+        run: ls -R collected
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            collected/**/*.{dmg,blockmap,exe}
+
